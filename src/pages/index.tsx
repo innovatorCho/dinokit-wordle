@@ -1,11 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import QuizPage from "./quiz";
+
+interface RESULT_STATUS = {
+  id: string;
+  result: string[];
+  status: string;
+}
 
 const HomePage = () => {
+  const [quizResultCount, setQuizResultCount] = useState<number>(5);
+  const [quizResultArray, setQuizResultArray] = useState<string[]>([]);
+
   const [quiz, setQuiz] = useState<stirng>("apple");
   const [answer, setAnswer] = useState<string>(null);
   const [findItem, setFindItem] = useState<string[]>([]);
   const [quizArr, setQuizArr] = useState<string[]>([]);
+
   let itemData:string[] = ['a','b'];
+  const resultArray = [
+    {"id": "qr001", "result": [],"status": "NONE"},
+    {"id": "qr002", "result": [],"status": "NONE"},
+    {"id": "qr003", "result": [],"status": "NONE"},
+    {"id": "qr004", "result": [],"status": "NONE"},
+    {"id": "qr005", "result": [],"status": "NONE"},
+    {"id": "qr006", "result": [],"status": "NONE"}
+  ];
+  
 
   const handleForAnwser = (e) => {
     setAnswer(e.target.value);
@@ -19,6 +39,9 @@ const HomePage = () => {
     try{
 
       console.log("==========================================================");
+      checkedResult();
+      return;
+
       const quizArray = splitString(quiz);
       const answerArray = splitString(answer);
 
@@ -49,48 +72,52 @@ const HomePage = () => {
     }
   }
 
+  /**
+   * 초기화
+   * 사용자가 입력한 데이터를 초기화 한다.
+   */
+  const resetToResult = () => {
+    setQuizResultArray(resultArray);
+    alert(`퀴즈 초기화 완료`);
+  }
+
+
+
+  /**
+   * 퀴즈의 정답 리스트 만들기
+   */
+  const checkedResult = () => {
+    console.log(answer);
+    console.log(quizResultArray);
+
+    for(let i = 0 ; i < quizResultArray.length ; i++) {
+      const item = quizResultArray[i];
+      if(item.status === "NONE") {
+        item.status = "SUCCESS";
+        console.log(item.result.length)
+        console.log(item);
+        break;
+      }
+    }
+  }
+
   const splitString = (inputText: string) => {
     return inputText.split('');
   }
 
+  useEffect(() => {
+    resetToResult();
+  }, [])
 
   return(
-    <div className=" flex justify-center flex-col items-center p-2 ">
+    <div >
       <div className=" mb-8">Dino__kit Wordle</div>
-      <div className=" pt-5 bg-slate-300 w-1/4 border-solid border-2 border-black rounded-md flex justify-between">
-          <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16">asd</div>
-          <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16">asd</div>
-          <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16">asd</div>
-          <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16">asd</div>
-          <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16">asd</div>
-      </div>
-      <div className=" pt-5 bg-slate-300 w-1/4 border-solid border-2 border-black rounded-md flex justify-between">
-        {
-          quizArr.map((item, index) => {
-            console.log("--------------------------->>")
-            let divTag = <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16"></div>; 
-            findItem.map(data => {
-              
-              if(data.index === index) {
-                console.log(`${index} >> data ${data.value}, ${data.index}`);
-                divTag = (<div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16">{data.value}</div>);
-              }
-            })
-            return divTag;
-            console.log("---------------------------<<")
-          })
-        }
-      </div>
-      <div className=" pt-5 bg-slate-300 w-1/4 border-solid border-2 border-black rounded-md flex justify-between">
-      {
-        itemData.map((item, index) => (
-          <div className=" bg-red-300 border-solid border-2 border-black w-1/5 h-16" key={index}>{item}</div>
-        ))
-      }
-      </div>
+      <QuizPage quizResultArray={quizResultArray} quizArr={quizArr} findItem={findItem}/>
+
       <div className=" bg-orange-200 h-full w-full">
         <input type="text" onChange={handleForAnwser} onKeyDown={validEnterEvent}></input>
         <button onClick={handleForClick}>확인</button>
+        <button onClick={resetToResult}>초기화</button>
       </div>
     </div>
   )
